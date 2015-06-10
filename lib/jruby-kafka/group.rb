@@ -157,7 +157,7 @@ class Kafka::Group
     @running = false
   end
 
-  def run(a_num_threads, a_queue)
+  def run(a_num_threads, &block)
     begin
       if @reset_beginning == 'from-beginning'
         Java::kafka::utils::ZkUtils.maybeDeletePath(@zk_connect, "/consumers/#{@group_id}")
@@ -176,7 +176,7 @@ class Kafka::Group
 
     thread_number = 0
     streams.each do |stream|
-      @executor_submit.call(Kafka::Consumer.new(stream, thread_number, a_queue, @consumer_restart_on_error, @consumer_restart_sleep_ms))
+      @executor_submit.call(Kafka::Consumer.new(stream, thread_number, @consumer_restart_on_error, @consumer_restart_sleep_ms, block))
       thread_number += 1
     end
     @running = true

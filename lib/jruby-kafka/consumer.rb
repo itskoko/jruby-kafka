@@ -11,12 +11,12 @@ class Kafka::Consumer
   include Java::JavaLang::Runnable
   java_signature 'void run()'
 
-  def initialize(a_stream, a_thread_number, a_queue, restart_on_exception, a_sleep_ms)
+  def initialize(a_stream, a_thread_number, restart_on_exception, a_sleep_ms, callback)
     @m_thread_number = a_thread_number
     @m_stream = a_stream
-    @m_queue = a_queue
     @m_restart_on_exception = restart_on_exception
     @m_sleep_ms = 1.0 / 1000.0 * Float(a_sleep_ms)
+    @m_callback = callback
   end
 
   def run
@@ -24,7 +24,7 @@ class Kafka::Consumer
     begin
       while it.hasNext
         begin
-          @m_queue << it.next
+          @m_callback.call(it.next)
         end
       end
     rescue Exception => e

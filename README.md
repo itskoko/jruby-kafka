@@ -53,9 +53,9 @@ The following producer code sends a message to a `test` topic
 ```ruby
 require 'jruby-kafka'
 
-producer_options = {:broker_list => "localhost:9092", "serializer.class" => "kafka.serializer.StringEncoder"}
+producer_options = {:broker_list => "192.168.59.103:9092", "serializer.class" => "kafka.serializer.StringEncoder"}
 
-producer = Kafka::Producer.new(producer_options)
+producer = Kafka::KafkaProducer.new(producer_options)
 producer.connect()
 producer.send_msg("test", nil, "here's a test message")    
 ```
@@ -67,14 +67,14 @@ require 'jruby-kafka'
 
 consumer_options = {
   :topic_id => "test", 
-  :zk_connect => "localhost:2181", 
-  :group_id => "my_consumer_group", 
-  :reset_beginning => "from-beginning", 
+  :zk_connect => "192.168.59.103:2181", 
+  :group_id => "test_group", 
+  :auto_commit_enable => "#{true}",
   :auto_offset_reset => "smallest"
 }
 
 consumer_group = Kafka::Group.new(consumer_options)
-queue = SizedQueue.new(20)
+queue = SizedQueue.new(1)
 consumer_group.run(1,queue)
 
 count = 0

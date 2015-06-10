@@ -8,7 +8,7 @@ class TestKafka < Test::Unit::TestCase
 
   def send_msg
     options = {
-      :broker_list => 'localhost:9092',
+      :broker_list => '192.168.59.103:9092',
       :serializer_class => 'kafka.serializer.StringEncoder'
     }
     producer = Kafka::Producer.new(options)
@@ -18,7 +18,7 @@ class TestKafka < Test::Unit::TestCase
 
   def send_msg_deprecated
     options = {
-      :broker_list => 'localhost:9092',
+      :broker_list => '192.168.59.103:9092',
       :serializer_class => 'kafka.serializer.StringEncoder'
     }
     producer = Kafka::Producer.new(options)
@@ -28,7 +28,7 @@ class TestKafka < Test::Unit::TestCase
 
   def producer_compression_send(compression_codec='none')
     options = {
-      :broker_list => 'localhost:9092',
+      :broker_list => '192.168.59.103:9092',
       :compression_codec => compression_codec,
       :serializer_class => 'kafka.serializer.StringEncoder'
     }
@@ -58,9 +58,8 @@ class TestKafka < Test::Unit::TestCase
   end
 
   def test_run
-    queue = SizedQueue.new(20)
     options = {
-      :zk_connect => 'localhost:2181',
+      :zk_connect => '192.168.59.103:2181',
       :group_id => 'test',
       :topic_id => 'test',
       :zk_connect_timeout => '1000',
@@ -70,48 +69,56 @@ class TestKafka < Test::Unit::TestCase
     }
     group = Kafka::Group.new(options)
     assert(!group.running?)
-    group.run(1,queue)
+    messages = Queue.new
+    group.run(1) do |message|
+      messages << message.message.to_s
+    end
     send_test_messages
     assert(group.running?)
+    sleep 10
     group.shutdown
+
     found = []
-    until queue.empty?
-      found << queue.pop.message.to_s
+    until messages.empty?
+      found << messages.pop
     end
     assert_equal([ "codec gzip test message",
                    "codec none test message",
                    "codec snappy test message",
                    "test message" ],
-                 found.map(&:to_s).uniq.sort,)
+                  found.to_a.uniq.sort)
   end
 
   def test_from_beginning
-    queue = SizedQueue.new(20)
     options = {
-      :zk_connect => 'localhost:2181',
+      :zk_connect => '192.168.59.103:2181',
       :group_id => 'beginning',
       :topic_id => 'test',
       :reset_beginning => 'from-beginning',
       :auto_offset_reset => 'smallest'
     }
     group = Kafka::Group.new(options)
-    group.run(2,queue)
-    Java::JavaLang::Thread.sleep 10000
+    messages = []
+    group.run(2) do |message|
+      messages << message.message.to_s
+    end
+    sleep 1
     group.shutdown
+
     found = []
-    until queue.empty?
-      found << queue.pop.message.to_s
+    until messages.empty?
+      found << messages.pop
     end
     assert_equal([ "codec gzip test message",
                    "codec none test message",
                    "codec snappy test message",
                    "test message" ],
-                 found.map(&:to_s).uniq.sort)
+                 found.uniq.sort)
   end
 
   def produce_to_different_topics
     options = {
-      :broker_list => 'localhost:9092',
+      :broker_list => '192.168.59.103:9092',
       :serializer_class => 'kafka.serializer.StringEncoder'
     }
     producer = Kafka::Producer.new(options)
@@ -122,19 +129,23 @@ class TestKafka < Test::Unit::TestCase
   end
 
   def test_topic_whitelist
-    queue = SizedQueue.new(20)
     options = {
-      :zk_connect => 'localhost:2181',
+      :zk_connect => '192.168.59.103:2181',
       :group_id => 'topics',
       :allow_topics => 'ca.*',
     }
     group = Kafka::Group.new(options)
-    group.run(2,queue)
+    messages = []
     produce_to_different_topics
+    group.run(2) do |message|
+      messages << message.message.to_s
+    end
+    sleep 1
     group.shutdown
+
     found = []
-    until queue.empty?
-      found << queue.pop.message.to_s
+    until messages.empty?
+      found << messages.pop
     end
     assert(found.include?("cabin message"))
     assert(found.include?("carburetor message"))
@@ -142,23 +153,26 @@ class TestKafka < Test::Unit::TestCase
   end
 
   def test_topic_blacklist
-    queue = SizedQueue.new(20)
     options = {
-      :zk_connect => 'localhost:2181',
+      :zk_connect => '192.168.59.103:2181',
       :group_id => 'topics',
       :filter_topics => 'ca.*',
     }
     group = Kafka::Group.new(options)
+    messages = []
     produce_to_different_topics
-    group.run(2,queue)
+    group.run(2) do |message|
+      messages << message.message.to_s
+    end
+    sleep 1
     group.shutdown
+
     found = []
-    until queue.empty?
-      found << queue.pop.message.to_s
+    until messages.empty?
+      found << messages.pop
     end
     assert(!found.include?("cabin message"))
     assert(!found.include?("carburetor message"))
     assert(found.include?("apple message"))
   end
-
 end
