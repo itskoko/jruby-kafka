@@ -1,12 +1,12 @@
 Gem::Specification.new do |spec|
 
-  spec.name          = 'jruby-kafka'
-  spec.version       = '1.4.0'
-  spec.authors       = ['Joseph Lawson']
-  spec.email         = ['joe@joekiller.com']
-  spec.description   = 'this is primarily to be used as an interface for logstash'
+  spec.name          = File.basename(__FILE__, '.gemspec')
+  spec.version       = '2.0.0'
+  spec.authors       = ['Kareem Kouddous']
+  spec.email         = ['kareemknyc@gmail.com']
+  spec.description   = 'Ruby wrapper around java kafka high-level consumer'
   spec.summary       = 'jruby Kafka wrapper'
-  spec.homepage      = 'https://github.com/joekiller/jruby-kafka'
+  spec.homepage      = 'https://github.com/itskoko/jruby-kafka'
   spec.license       = 'Apache 2.0'
   spec.platform      = 'java'
   spec.require_paths = [ 'lib' ]
