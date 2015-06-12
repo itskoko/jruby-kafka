@@ -70,8 +70,8 @@ class TestKafka < Test::Unit::TestCase
     group = Kafka::Group.new(options)
     assert(!group.running?)
     messages = Queue.new
-    group.run(1) do |message|
-      messages << message.message.to_s
+    group.run(1) do |message, metadata|
+      messages << message
     end
     send_test_messages
     assert(group.running?)
@@ -99,8 +99,8 @@ class TestKafka < Test::Unit::TestCase
     }
     group = Kafka::Group.new(options)
     messages = []
-    group.run(2) do |message|
-      messages << message.message.to_s
+    group.run(2) do |message, metadata|
+      messages << message
     end
     sleep 1
     group.shutdown
@@ -137,8 +137,8 @@ class TestKafka < Test::Unit::TestCase
     group = Kafka::Group.new(options)
     messages = []
     produce_to_different_topics
-    group.run(2) do |message|
-      messages << message.message.to_s
+    group.run(2) do |message, metadata|
+      messages << message
     end
     sleep 1
     group.shutdown
@@ -161,8 +161,8 @@ class TestKafka < Test::Unit::TestCase
     group = Kafka::Group.new(options)
     messages = []
     produce_to_different_topics
-    group.run(2) do |message|
-      messages << message.message.to_s
+    group.run(2) do |message, metadata|
+      messages << message
     end
     sleep 1
     group.shutdown

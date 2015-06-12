@@ -24,12 +24,12 @@ class Kafka::Consumer
     begin
       while it.hasNext
         begin
-          @m_callback.call(it.next)
+          message = it.next
+          @m_callback.call(message.message.to_s, MetaData.new(message.topic, message.partition, message.offset))
         end
       end
     rescue Exception => e
-      puts("#{self.class.name} caught exception: #{e.class.name}")
-      puts(e.message) if e.message != ''
+      # Log exception (or only retry if consumer timed out)
       if @m_restart_on_exception
         sleep(@m_sleep_ms)
         retry
@@ -38,4 +38,6 @@ class Kafka::Consumer
       end
     end
   end
+
+  class MetaData < Struct.new(:topic, :partition, :offset); end
 end

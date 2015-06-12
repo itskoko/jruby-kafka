@@ -55,7 +55,7 @@ require 'jruby-kafka'
 
 producer_options = {:broker_list => "192.168.59.103:9092", "serializer.class" => "kafka.serializer.StringEncoder"}
 
-producer = Kafka::KafkaProducer.new(producer_options)
+producer = Kafka::Producer.new(producer_options)
 producer.connect()
 producer.send_msg("test", nil, "here's a test message")    
 ```
@@ -66,16 +66,17 @@ The following consumer example indefinitely listens to the `test` topic and prin
 require 'jruby-kafka'
 
 consumer_options = {
-  :topic_id => "test", 
+  :topic_id => "test",
   :zk_connect => "192.168.59.103:2181", 
-  :group_id => "test_group", 
-  :auto_commit_enable => "#{true}",
-  :auto_offset_reset => "smallest"
+  :group_id => "test_group_1", 
+  :auto_commit_enable => "#{false}",
+  :auto_offset_reset => "smallest",
 }
 
 consumer_group = Kafka::Group.new(consumer_options)
-queue = SizedQueue.new(1)
-consumer_group.run(1,queue)
+consumer_group.run(2) do |message, metadata|
+  puts "topic: #{metadata.topic}, partition: #{metadata.partition} offset: #{metadata.offset}, message: #{message}"
+end
 
 count = 0
 
@@ -83,13 +84,6 @@ trap('SIGINT') do
   consumer_group.shutdown()
   puts "Consumed #{count} messages"
   exit
-end
-
-loop do
-  if !queue.empty?
-    puts "#{count}\t#{queue.pop.message.to_s}"
-    count += 1
-  end
 end
 ```
 

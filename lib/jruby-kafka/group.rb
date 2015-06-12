@@ -9,6 +9,8 @@ class Kafka::Group
   java_import 'java.util.concurrent.Executors'
   java_import 'org.I0Itec.zkclient.exception.ZkException'
 
+  attr_reader :topic
+
   # Create a Kafka client group
   #
   # options:
@@ -184,6 +186,10 @@ class Kafka::Group
 
   def running?
     @running
+  end
+
+  def commit(metadata)
+    @consumer.commitOffset(metadata.topic, metadata.partition, metadata.offset+1)
   end
 
   private
