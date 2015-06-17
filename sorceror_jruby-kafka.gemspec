@@ -1,6 +1,6 @@
 Gem::Specification.new do |spec|
   spec.name          = File.basename(__FILE__, '.gemspec')
-  spec.version       = '2.0.0'
+  spec.version       = '2.0.1'
   spec.authors       = ['Kareem Kouddous']
   spec.email         = ['kareemknyc@gmail.com']
   spec.description   = 'Ruby wrapper around java kafka high-level consumer'
