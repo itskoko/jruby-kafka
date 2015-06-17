@@ -17,3 +17,5 @@ tmp
 target
 .jbundler
 Jarfile.lock
+lib/sorceror_jruby-kafka_jars.rb
+.ruby-version

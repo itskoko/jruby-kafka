@@ -1,5 +1,4 @@
 Gem::Specification.new do |spec|
-
   spec.name          = File.basename(__FILE__, '.gemspec')
   spec.version       = '2.0.0'
   spec.authors       = ['Kareem Kouddous']

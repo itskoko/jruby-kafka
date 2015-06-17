@@ -57,7 +57,7 @@ producer_options = {:broker_list => "192.168.59.103:9092", "serializer.class" =>
 
 producer = Kafka::Producer.new(producer_options)
 producer.connect()
-producer.send_msg("test", nil, "here's a test message")    
+100.times { |i| producer.send_msg("test", i.to_s, i.to_s) }
 ```
 
 The following consumer example indefinitely listens to the `test` topic and prints out messages as they are received from Kafka:
@@ -67,23 +67,25 @@ require 'jruby-kafka'
 
 consumer_options = {
   :topic_id => "test",
-  :zk_connect => "192.168.59.103:2181", 
-  :group_id => "test_group_1", 
+  :zk_connect => "192.168.59.103:2181",
+  :group_id => "test_group",
   :auto_commit_enable => "#{false}",
   :auto_offset_reset => "smallest",
 }
 
+messages = Queue.new
+
 consumer_group = Kafka::Group.new(consumer_options)
 consumer_group.run(2) do |message, metadata|
-  puts "topic: #{metadata.topic}, partition: #{metadata.partition} offset: #{metadata.offset}, message: #{message}"
+  messages << [message, metadata]
+  consumer_group.commit(metadata)
+  sleep 0.5
+  print message
 end
-
-count = 0
 
 trap('SIGINT') do
   consumer_group.shutdown()
-  puts "Consumed #{count} messages"
-  exit
+  puts "Consumed #{messages.size} messages"
 end
 ```
 

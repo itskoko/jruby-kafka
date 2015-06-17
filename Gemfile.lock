@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    jruby-kafka (1.4.0-java)
+    sorceror_jruby-kafka (2.0.0-java)
       jar-dependencies (~> 0)
       ruby-maven (~> 3.1)
 
@@ -18,5 +18,8 @@ PLATFORMS
   java
 
 DEPENDENCIES
-  jruby-kafka!
   rake (~> 10.4)
+  sorceror_jruby-kafka!
+
+BUNDLED WITH
+   1.10.3
