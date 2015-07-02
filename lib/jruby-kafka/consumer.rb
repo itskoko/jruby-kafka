@@ -25,7 +25,7 @@ class Kafka::Consumer
       while it.hasNext
         begin
           message = it.next
-          @m_callback.call(message.message.to_s, MetaData.new(message.topic, message.partition, message.offset))
+          @m_callback.call(message.message.to_s, MetaData.new(message.key.to_s, message.topic, message.partition, message.offset))
         end
       end
     rescue Exception => e
@@ -39,5 +39,5 @@ class Kafka::Consumer
     end
   end
 
-  class MetaData < Struct.new(:topic, :partition, :offset); end
+  class MetaData < Struct.new(:key, :topic, :partition, :offset); end
 end
