@@ -1,16 +1,16 @@
 PATH
   remote: .
   specs:
-    sorceror_jruby-kafka (2.0.0-java)
+    sorceror_jruby-kafka (2.1.0-java)
       jar-dependencies (~> 0)
       ruby-maven (~> 3.1)
 
 GEM
   remote: https://rubygems.org/
   specs:
-    jar-dependencies (0.1.14)
+    jar-dependencies (0.2.2)
     rake (10.4.2)
-    ruby-maven (3.3.2)
+    ruby-maven (3.3.5)
       ruby-maven-libs (~> 3.3.1)
     ruby-maven-libs (3.3.3)
 
@@ -22,4 +22,4 @@ DEPENDENCIES
   sorceror_jruby-kafka!
 
 BUNDLED WITH
-   1.10.3
+   1.10.4

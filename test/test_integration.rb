@@ -1,6 +1,8 @@
 require 'test/unit'
 
 class TestKafka < Test::Unit::TestCase
+  BROKER_IP = `docker-machine ip default`.strip
+
   def setup
     $:.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
     require 'jruby-kafka'
@@ -8,17 +10,17 @@ class TestKafka < Test::Unit::TestCase
 
   def send_msg
     options = {
-      :broker_list => '192.168.59.103:9092',
+      :broker_list => "#{BROKER_IP}:9092",
       :serializer_class => 'kafka.serializer.StringEncoder'
     }
     producer = Kafka::Producer.new(options)
     producer.connect
-    producer.send_msg('test',nil, 'test message')
+    producer.send_msg('test',nil, nil, 'test message')
   end
 
   def send_msg_deprecated
     options = {
-      :broker_list => '192.168.59.103:9092',
+      :broker_list => "#{BROKER_IP}:9092",
       :serializer_class => 'kafka.serializer.StringEncoder'
     }
     producer = Kafka::Producer.new(options)
@@ -28,13 +30,13 @@ class TestKafka < Test::Unit::TestCase
 
   def producer_compression_send(compression_codec='none')
     options = {
-      :broker_list => '192.168.59.103:9092',
+      :broker_list => "#{BROKER_IP}:9092",
       :compression_codec => compression_codec,
       :serializer_class => 'kafka.serializer.StringEncoder'
     }
     producer = Kafka::Producer.new(options)
     producer.connect
-    producer.send_msg('test',nil, "codec #{compression_codec} test message")
+    producer.send_msg('test', nil, nil,  "codec #{compression_codec} test message")
   end
 
   def send_compression_none
@@ -59,7 +61,7 @@ class TestKafka < Test::Unit::TestCase
 
   def test_run
     options = {
-      :zk_connect => '192.168.59.103:2181',
+      :zk_connect => "#{BROKER_IP}:2181",
       :group_id => 'test',
       :topic_id => 'test',
       :zk_connect_timeout => '1000',
@@ -91,7 +93,7 @@ class TestKafka < Test::Unit::TestCase
 
   def test_from_beginning
     options = {
-      :zk_connect => '192.168.59.103:2181',
+      :zk_connect => "#{BROKER_IP}:2181",
       :group_id => 'beginning',
       :topic_id => 'test',
       :reset_beginning => 'from-beginning',
@@ -118,19 +120,19 @@ class TestKafka < Test::Unit::TestCase
 
   def produce_to_different_topics
     options = {
-      :broker_list => '192.168.59.103:9092',
+      :broker_list => "#{BROKER_IP}:9092",
       :serializer_class => 'kafka.serializer.StringEncoder'
     }
     producer = Kafka::Producer.new(options)
     producer.connect
-    producer.send_msg('apple', nil,      'apple message')
-    producer.send_msg('cabin', nil,      'cabin message')
-    producer.send_msg('carburetor', nil, 'carburetor message')
+    producer.send_msg('apple', nil, nil, 'apple message')
+    producer.send_msg('cabin', nil, nil, 'cabin message')
+    producer.send_msg('carburetor', nil, nil, 'carburetor message')
   end
 
   def test_topic_whitelist
     options = {
-      :zk_connect => '192.168.59.103:2181',
+      :zk_connect => "#{BROKER_IP}:2181",
       :group_id => 'topics',
       :allow_topics => 'ca.*',
     }
@@ -154,7 +156,7 @@ class TestKafka < Test::Unit::TestCase
 
   def test_topic_blacklist
     options = {
-      :zk_connect => '192.168.59.103:2181',
+      :zk_connect => "#{BROKER_IP}:2181",
       :group_id => 'topics',
       :filter_topics => 'ca.*',
     }
